@@ -1,0 +1,67 @@
+pipeline
+{
+    agent any
+    
+      stages
+        {
+            stage('Continuous Download')
+            {
+               steps
+               {
+                 
+                git 'https://github.com/Omkarc392/Spring-boot.git'  //Download code from github to jenkins server
+                 
+               }
+           }
+                 
+            stage('Continuous Build')
+            {
+               steps
+               {
+                 
+                sh label: '', script: 'mvn package' //Build artifact (.jar file generated)
+                 
+               }
+           }     
+                 
+            stage('Create Docker Image')
+                {
+                steps
+                {
+                 
+                sh label: '', script: 'sudo docker build -t omkarc392/myrepo:springbootapp .'
+                 
+               }
+           }      
+                 
+        stage('Docker Login')
+           {
+               steps
+               {
+                 
+                
+                 withCredentials([string(credentialsId: 'hub_credentials', variable: 'hub_credentials')])
+             {
+   
+                  sh label: '', script: 'sudo docker login -u omkarc392 -p ${hub_credentials}'
+   
+             }
+ 
+               }
+           }     
+                 
+        stage('Docker Push')
+           {
+               steps
+               {
+                 
+                sh label: '', script: 'sudo docker push omkarc392/myrepo:springbootapp'
+                 
+               }
+           } 
+           
+          
+    
+             
+        }
+}

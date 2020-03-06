@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+        name: projectpod1
+        labels:
+                author: omkar
+                tier: front
+
+spec:
+        containers:
+                - name: projectapp
+                  image: omkarc392/myrepo:springbootapp
+
+...

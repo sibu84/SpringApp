@@ -1,0 +1,61 @@
+node ('master')
+
+
+     {
+    
+
+         stage('Continuous Download')
+
+             {
+
+                  git 'https://github.com/Omkarc392/Spring-boot.git'  //Download code from github to jenkins server
+    
+              }
+
+
+         stage('Continuous Build')
+
+             {
+   
+                  sh label: '', script: 'mvn package' //Build artifact (.jar file generated)
+ 
+              }
+
+
+         stage("Create Docker Image")
+  
+             {
+     
+                  sh label: '', script: 'sudo docker build -t omkarc392/myrepo:springbootapp .'
+ 
+             }
+    
+  
+
+         stage("Docker login")
+    withCredentials([string(credentialsId: 'hub_credentials', variable: 'hub_credentials')])
+             {
+   
+                  sh label: '', script: 'sudo docker login -u omkarc392 -p ${hub_credentials}'
+   
+             }
+    
+     
+    stage("Docker Push")
+   
+             {
+     
+                  sh label: '', script: 'sudo docker push omkarc392/myrepo:springbootapp'
+  
+              }
+         stage("Start pod definition file")
+             {
+                 sh label: '', script: 'kubectl create -f /home/omkar_c392/pod-def.yml'
+             }
+ 
+
+         stage("Start Service definition file")
+             {
+                sh label: '', script: 'kubectl create -f /home/omkar_c392/service1.yml'
+             }
+}
